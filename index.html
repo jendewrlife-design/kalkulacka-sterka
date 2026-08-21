@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulacka uspory - dekorativni sterka</title>
+<title>Kalkulačka úspory - dekorativní stěrka</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -61,19 +61,19 @@
 <div class="wrap">
   <div>
     <div class="toggle">
-      <button id="btn-stara" class="active">Stara stena s vymalbou</button>
-      <button id="btn-nova">Nova / opravovana stena</button>
+      <button id="btn-stara" class="active">Stará stěna s výmalbou</button>
+      <button id="btn-nova">Nová / opravovaná stěna</button>
     </div>
-    <p id="typ-hint">Jedna probarvena vrstva staci na starou omitku po seskrabani vymalby.</p>
+    <p id="typ-hint">Jedna probarvená vrstva stačí na starou omítku po seškrábání výmalby.</p>
   </div>
 
   <div class="grid2">
     <div>
-      <label for="sirka">Sirka steny (m)</label>
+      <label for="sirka">Šířka stěny (m)</label>
       <input type="number" id="sirka" value="5" min="0.1" step="0.1">
     </div>
     <div>
-      <label for="vyska">Vyska steny (m)</label>
+      <label for="vyska">Výška stěny (m)</label>
       <input type="number" id="vyska" value="2.6" min="0.1" step="0.1">
     </div>
   </div>
@@ -81,39 +81,39 @@
   <div id="err"></div>
 
   <div class="box">
-    <span>Plocha steny</span>
-    <span id="m2-out">13 m2</span>
+    <span>Plocha stěny</span>
+    <span id="m2-out">13 m²</span>
   </div>
 
   <div class="row2">
     <div class="card remeslnik">
-      <p>Remeslnik by te stal</p>
-      <p id="remeslnik-out">22 100 - 28 600 Kc</p>
+      <p>Řemeslník by tě stál</p>
+      <p id="remeslnik-out">22 100 - 28 600 Kč</p>
     </div>
     <div class="card uspora">
-      <p>Usetris</p>
-      <p id="uspora-out">19 200 - 25 700 Kc</p>
+      <p>Ušetříš</p>
+      <p id="uspora-out">19 188 - 25 688 Kč</p>
     </div>
   </div>
 
   <div class="navod-box">
-    <p>I po nakupu meho navodu (490 Kc) porad usetris</p>
-    <p id="usporanavod-out">18 700 - 25 200 Kc</p>
+    <p>I po nákupu mého návodu (490 Kč) pořád ušetříš</p>
+    <p id="usporanavod-out">18 698 - 25 198 Kč</p>
   </div>
 
   <div class="material">
-    <p>Co budes potrebovat</p>
+    <p>Co budeš potřebovat</p>
     <table>
-      <tr><td>Kerastuk</td><td id="ker-out">40 kg</td></tr>
-      <tr id="row-podklad" style="display:none;"><td>Podkladni vrstva</td><td id="podklad-out">15 kg</td></tr>
-      <tr><td>Pigment hneda</td><td id="pigh-out">68 g</td></tr>
-      <tr><td>Pigment zluta</td><td id="pigz-out">83 g</td></tr>
+      <tr><td>Keraštuk</td><td id="ker-out">40 kg balení</td></tr>
+      <tr id="row-podklad" style="display:none;"><td>Podkladní vrstva</td><td id="podklad-out">15 kg balení</td></tr>
+      <tr><td>Pigment hnědá</td><td id="pigh-out">68 g</td></tr>
+      <tr><td>Pigment žlutá</td><td id="pigz-out">83 g</td></tr>
       <tr><td>Lak (2 vrstvy)</td><td id="lak-out">3.7 kg</td></tr>
-      <tr><td>Penetrace</td><td>1x 5kg baleni</td></tr>
-      <tr class="total"><td>Material celkem</td><td id="mat-out">2 913 Kc</td></tr>
+      <tr><td>Penetrace</td><td>1x 5kg balení</td></tr>
+      <tr class="total"><td>Materiál celkem</td><td id="mat-out">2 912 Kč</td></tr>
     </table>
   </div>
-  <p class="footnote">Orientacni vypocet z aktualnich cen materialu.</p>
+  <p class="footnote">Orientační výpočet z aktuálních cen materiálu.</p>
 </div>
 
 <script>
@@ -128,11 +128,11 @@ function bucket(m2){
   return {kg:buckets*40};
 }
 function label(kg){
-  if(kg===15) return "15 kg baleni";
-  if(kg===40) return "40 kg baleni";
-  if(kg===55) return "40 kg + 15 kg baleni";
-  if(kg===80) return "2x 40 kg baleni";
-  return (kg/40)+"x 40 kg baleni";
+  if(kg===15) return "15 kg balení";
+  if(kg===40) return "40 kg balení";
+  if(kg===55) return "40 kg + 15 kg balení";
+  if(kg===80) return "2x 40 kg balení";
+  return (kg/40)+"x 40 kg balení";
 }
 function fmt(n){ return Math.round(n).toLocaleString('cs-CZ'); }
 
@@ -142,7 +142,7 @@ function calc(){
   var err=document.getElementById('err');
   if(!s||!v||s<=0||v<=0){
     err.style.display='block';
-    err.textContent='Zadej sirku i vysku steny (v metrech).';
+    err.textContent='Zadej šířku i výšku stěny (v metrech).';
     return;
   }
   err.style.display='none';
@@ -173,15 +173,15 @@ function calc(){
   var uspMin=remMin-material, uspMax=remMax-material;
   var uspNavodMin=uspMin-490, uspNavodMax=uspMax-490;
 
-  document.getElementById('m2-out').textContent=(Math.round(m2*10)/10)+' m2';
-  document.getElementById('remeslnik-out').textContent=fmt(remMin)+' - '+fmt(remMax)+' Kc';
-  document.getElementById('uspora-out').textContent=fmt(uspMin)+' - '+fmt(uspMax)+' Kc';
-  document.getElementById('usporanavod-out').textContent=fmt(uspNavodMin)+' - '+fmt(uspNavodMax)+' Kc';
+  document.getElementById('m2-out').textContent=(Math.round(m2*10)/10)+' m²';
+  document.getElementById('remeslnik-out').textContent=fmt(remMin)+' - '+fmt(remMax)+' Kč';
+  document.getElementById('uspora-out').textContent=fmt(uspMin)+' - '+fmt(uspMax)+' Kč';
+  document.getElementById('usporanavod-out').textContent=fmt(uspNavodMin)+' - '+fmt(uspNavodMax)+' Kč';
   document.getElementById('ker-out').textContent=label(b.kg);
   document.getElementById('pigh-out').textContent=Math.round(pigH)+' g';
   document.getElementById('pigz-out').textContent=Math.round(pigZ)+' g';
   document.getElementById('lak-out').textContent=(Math.round(lakKg*10)/10)+' kg';
-  document.getElementById('mat-out').textContent=fmt(material)+' Kc';
+  document.getElementById('mat-out').textContent=fmt(material)+' Kč';
 }
 
 document.getElementById('sirka').addEventListener('input',calc);
@@ -191,14 +191,14 @@ document.getElementById('btn-stara').addEventListener('click',function(){
   typNova=false;
   this.classList.add('active');
   document.getElementById('btn-nova').classList.remove('active');
-  document.getElementById('typ-hint').textContent='Jedna probarvena vrstva staci na starou omitku po seskrabani vymalby.';
+  document.getElementById('typ-hint').textContent='Jedna probarvená vrstva stačí na starou omítku po seškrábání výmalby.';
   calc();
 });
 document.getElementById('btn-nova').addEventListener('click',function(){
   typNova=true;
   this.classList.add('active');
   document.getElementById('btn-stara').classList.remove('active');
-  document.getElementById('typ-hint').textContent='Sadrokarton, lepidlo s perlinkou nebo nova omitka - doporucene jsou dve vrstvy.';
+  document.getElementById('typ-hint').textContent='Sádrokarton, lepidlo s perlinkou nebo nová omítka - doporučené jsou dvě vrstvy.';
   calc();
 });
 
