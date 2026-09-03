@@ -55,6 +55,12 @@
   tr.total td { padding-top: 8px; font-weight: 500; }
   tr.total td:last-child { color: #c9a876; }
   .footnote { font-size: 12px; color: #6e655a; margin-top: 12px; }
+  .box .m2-field input[type="number"] {
+    width: 64px; background: transparent; border: none;
+    border-bottom: 1px solid #4a4038; color: inherit; font: inherit;
+    padding: 0 2px 1px; text-align: right;
+  }
+  .box .m2-field input[type="number"]:focus { outline: none; border-bottom-color: #c9a876; }
 </style>
 </head>
 <body>
@@ -70,11 +76,11 @@
   <div class="grid2">
     <div>
       <label for="sirka">Šířka stěny (m)</label>
-      <input type="number" id="sirka" value="5" min="0.1" step="0.1">
+      <input type="number" id="sirka" placeholder="např. 5" min="0.1" step="0.1">
     </div>
     <div>
       <label for="vyska">Výška stěny (m)</label>
-      <input type="number" id="vyska" value="2.6" min="0.1" step="0.1">
+      <input type="number" id="vyska" placeholder="např. 2,6" min="0.1" step="0.1">
     </div>
   </div>
 
@@ -82,7 +88,7 @@
 
   <div class="box">
     <span>Plocha stěny</span>
-    <span id="m2-out">13 m²</span>
+    <span class="m2-field"><input type="number" id="m2-out" value="30" min="0.1" step="0.1"> m²</span>
   </div>
 
   <div class="row2">
@@ -109,11 +115,11 @@
       <tr><td>Pigment hnědá</td><td id="pigh-out">68 g</td></tr>
       <tr><td>Pigment žlutá</td><td id="pigz-out">83 g</td></tr>
       <tr><td>Lak (2 vrstvy)</td><td id="lak-out">3.7 kg</td></tr>
-      <tr><td>Penetrace</td><td>1x 5kg balení</td></tr>
+      <tr><td>Penetrace</td><td id="pen-out">1x 5kg balení</td></tr>
       <tr class="total"><td>Materiál celkem</td><td id="mat-out">2 912 Kč</td></tr>
     </table>
   </div>
-  <p class="footnote">Orientační výpočet z aktuálních cen materiálu.</p>
+  <p class="footnote">Materiál počítáme z aktuálních cen (penetrace odhadem 0,15 kg/m² dle spotřeby na obalu), cena řemeslníka je průměr reálných sazeb za m².</p>
 </div>
 
 <script>
@@ -136,18 +142,10 @@ function label(kg){
 }
 function fmt(n){ return Math.round(n).toLocaleString('cs-CZ'); }
 
-function calc(){
-  var s=parseFloat(document.getElementById('sirka').value);
-  var v=parseFloat(document.getElementById('vyska').value);
-  var err=document.getElementById('err');
-  if(!s||!v||s<=0||v<=0){
-    err.style.display='block';
-    err.textContent='Zadej šířku i výšku stěny (v metrech).';
-    return;
-  }
-  err.style.display='none';
+var currentM2=30;
 
-  var m2=s*v;
+function calcFromArea(m2){
+  currentM2=m2;
   var b=bucket(m2);
   var kerastukKg=m2*3;
   var kerastukCena=b.kg*12.7;
@@ -167,42 +165,81 @@ function calc(){
   var pigCena=(pigH*0.1925)+(pigZ*0.20);
   var lakKg=m2*(2/7);
   var lakCena=lakKg*561.25;
-  var penetraceCena=290;
+  var penBaleni=Math.max(1, Math.ceil((m2*0.15)/5));
+  var penetraceCena=penBaleni*290;
   var material=kerastukCena+podkladCena+pigCena+lakCena+penetraceCena;
   var remMin=m2*1700, remMax=m2*2200;
   var uspMin=remMin-material, uspMax=remMax-material;
   var uspNavodMin=uspMin-490, uspNavodMax=uspMax-490;
 
-  document.getElementById('m2-out').textContent=(Math.round(m2*10)/10)+' m²';
   document.getElementById('remeslnik-out').textContent=fmt(remMin)+' - '+fmt(remMax)+' Kč';
   document.getElementById('uspora-out').textContent=fmt(uspMin)+' - '+fmt(uspMax)+' Kč';
   document.getElementById('usporanavod-out').textContent=fmt(uspNavodMin)+' - '+fmt(uspNavodMax)+' Kč';
   document.getElementById('ker-out').textContent=label(b.kg);
+  document.getElementById('pen-out').textContent=(penBaleni===1 ? '1x 5kg balení' : penBaleni+'x 5kg balení');
   document.getElementById('pigh-out').textContent=Math.round(pigH)+' g';
   document.getElementById('pigz-out').textContent=Math.round(pigZ)+' g';
   document.getElementById('lak-out').textContent=(Math.round(lakKg*10)/10)+' kg';
   document.getElementById('mat-out').textContent=fmt(material)+' Kč';
 }
 
-document.getElementById('sirka').addEventListener('input',calc);
-document.getElementById('vyska').addEventListener('input',calc);
+// Rozměry (šířka × výška) -> dopočítá m² a přepíše pole "Plocha stěny"
+function calcFromDimensions(){
+  var sRaw=document.getElementById('sirka').value;
+  var vRaw=document.getElementById('vyska').value;
+  var err=document.getElementById('err');
+  if(sRaw===''||vRaw===''){
+    err.style.display='none';
+    return; // čeká se, až vyplní obě pole - neřve to hned po prvním písmenku
+  }
+  var s=parseFloat(sRaw);
+  var v=parseFloat(vRaw);
+  if(!s||!v||s<=0||v<=0){
+    err.style.display='block';
+    err.textContent='Zadej šířku i výšku stěny (v metrech).';
+    return;
+  }
+  err.style.display='none';
+  var m2=s*v;
+  document.getElementById('m2-out').value=Math.round(m2*10)/10;
+  calcFromArea(m2);
+}
+
+// Přímé zadání m² -> ignoruje rozměry, počítá rovnou z plochy
+function calcFromM2Input(){
+  var raw=document.getElementById('m2-out').value;
+  var err=document.getElementById('err');
+  var m2=parseFloat(raw);
+  if(!m2||m2<=0){
+    err.style.display='block';
+    err.textContent='Zadej plochu stěny (m²) větší než 0.';
+    return;
+  }
+  err.style.display='none';
+  calcFromArea(m2);
+}
+
+document.getElementById('sirka').addEventListener('input',calcFromDimensions);
+document.getElementById('vyska').addEventListener('input',calcFromDimensions);
+document.getElementById('m2-out').addEventListener('input',calcFromM2Input);
 
 document.getElementById('btn-stara').addEventListener('click',function(){
   typNova=false;
   this.classList.add('active');
   document.getElementById('btn-nova').classList.remove('active');
   document.getElementById('typ-hint').textContent='Jedna probarvená vrstva stačí na starou omítku po seškrábání výmalby.';
-  calc();
+  calcFromArea(currentM2);
 });
 document.getElementById('btn-nova').addEventListener('click',function(){
   typNova=true;
   this.classList.add('active');
   document.getElementById('btn-stara').classList.remove('active');
   document.getElementById('typ-hint').textContent='Sádrokarton, lepidlo s perlinkou nebo nová omítka - doporučené jsou dvě vrstvy.';
-  calc();
+  calcFromArea(currentM2);
 });
 
-calc();
+// Výchozí stav: 30 m² (odpovídá headlinu na landing page), rozměry necháme prázdné
+calcFromArea(30);
 </script>
 </body>
 </html>
